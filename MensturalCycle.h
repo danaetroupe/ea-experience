@@ -1,8 +1,10 @@
 #pragma once
-#include string
-from namespace std;
+#include <string>
+#include <vector>
+using namespace std;
 
 // Prototype Objects
+// Stage
 class MoodSwing {
 public:
 	MoodSwing(int mood);
@@ -25,12 +27,12 @@ private:
 	string mName;
 };
 
-class Actions {
+class Action {
 public:
-	Actions(string name, bool involvesOtherSim //Animation animation);
-	~Actions();
+	Action(string name, bool involvesOtherSim /*Animation animation*/);
+	~Action();
 
-	act();
+	void act();
 private: 
 	// Animation animation; This imaginary class would associate a specific animation with the action
 };
@@ -58,6 +60,6 @@ public:
 	void switchStage(Stage stage);
 private:
 	vector<Product> mContainedProducts;
-	Stage mCurrentStage = Stage("Mensturation")
+	Stage mCurrentStage = Stage("Mensturation", {});
 	bool mActive = false; // Cycle starts inactive until first mensturation event.
 };
