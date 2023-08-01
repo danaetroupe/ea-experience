@@ -1,6 +1,10 @@
 #include <string>
 #include<iostream>
 #include <utility>
+#include <unordered_map>
+
+// https://github.com/danaetroupe/ea-experience
+// SEE GITHUB REPOSITORY FOR SOURCE CONTROL
 
 class Item {
 private:
@@ -35,6 +39,10 @@ public:
     float get_price() const {
         return price;
     }
+    
+    void set_price(int new_price) {
+        price = new_price;
+    }
 
     bool is_match(const std::string &other) {
         return name == other;
@@ -43,9 +51,9 @@ public:
 
 class Inventory {
 private:
-    Item *items[20];
+    std::unordered_map <std::string, Item*> items;
     float total_money;
-    int item_count;
+    // Unecessary count?
 
     static void display_data(Item &item) {
         std::cout << "\nItem name: " << item.get_name();
@@ -55,9 +63,7 @@ private:
 
 public:
     Inventory() :
-            items{},
-            total_money{0},
-            item_count{0} {
+           total_money{0} {
 
     }
 
@@ -71,31 +77,37 @@ public:
         std::cin >> name;
         std::cout << "Enter quantity: ";
         std::cin >> quantity;
-        std::cout << "Enter price: ";
+        std::cout << "Enter price (USD$): ";
         std::cin >> price;
-
-        items[item_count] = new Item(name, quantity, price);
-        item_count++;
+        if (items.count(name) == 0) {
+            // Insert new item in inventory
+            items[name] = new Item(name, quantity, price);
+        }
+        else {
+            // Identify item within inventory and change values
+            Item* item = items[name];
+            int current = item->get_quantity();
+            item->set_quantity(current + quantity);
+            item->set_price(price);
+        }
     }
 
     void sell_item() {
-        std::string item_to_check;
+        std::string name;
         std::cin.ignore();
         std::cout << "\nEnter item name: ";
-        std::cin >> item_to_check;
+        std::cin >> name;
 
-        for (int i = 0; i < item_count; i++) {
-            if (items[i]->is_match(item_to_check)) {
-                remove_item(i);
-                return;
-            }
-        }
-        std::cout << "\nThis item is not in your Inventory";
+        if (items.count(name) > 0) {
+            remove_item(name);
+        } else {
+            std::cout << "\nThis item is not in your Inventory";
+        } 
     }
 
-    void remove_item(int item_index) {
+    void remove_item(std::string name) {
         int input_quantity;
-        Item *item = items[item_index];
+        Item* item = items[name];
         std::cout << "\nEnter number of items to sell: ";
         std::cin >> input_quantity;
 
@@ -107,19 +119,24 @@ public:
             std::cout << "\nItems sold";
             std::cout << "\nMoney received: " << money_earned;
             total_money += money_earned;
+            std::cout << "\nTotal Money: " << total_money;
+        if (input_quantity == quantity) {
+            delete item;
+            items.erase(name);
+        }
         } else {
             std::cout << "\nCannot sell more items than you have.";
         }
     }
 
     void list_items() {
-        if (item_count == 0) {
+        if (items.size() == 0) {
             std::cout << "\nInventory empty.";
             return;
         }
 
-        for (int i = 0; i < item_count; i++) {
-            display_data(*items[i]);
+        for (auto item : items) {
+            display_data(*item.second);
             std::cout << "\n";
         }
     }
