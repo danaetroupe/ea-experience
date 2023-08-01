@@ -40,7 +40,7 @@ public:
         return price;
     }
     
-    void set_price(int new_price) {
+    void set_price(float new_price) {
         price = new_price;
     }
 
@@ -53,7 +53,6 @@ class Inventory {
 private:
     std::unordered_map <std::string, Item*> items;
     float total_money;
-    // Unecessary count?
 
     static void display_data(Item &item) {
         std::cout << "\nItem name: " << item.get_name();
@@ -67,6 +66,7 @@ public:
 
     }
 
+    // Prompts player to submit item info. 
     void add_item() {
         std::string name;
         int quantity;
@@ -83,6 +83,7 @@ public:
             // Insert new item in inventory
             items[name] = new Item(name, quantity, price);
         }
+        // If item already exists...
         else {
             // Identify item within inventory and change values
             Item* item = items[name];
@@ -91,20 +92,26 @@ public:
             item->set_price(price);
         }
     }
-
+    // Sell item
     void sell_item() {
         std::string name;
-        std::cin.ignore();
-        std::cout << "\nEnter item name: ";
-        std::cin >> name;
+        if (list_names()) {
+            std::cin.ignore();
+            std::cout << "\nEnter item name: ";
+            std::cin >> name;
 
-        if (items.count(name) > 0) {
-            remove_item(name);
-        } else {
-            std::cout << "\nThis item is not in your Inventory";
+            if (items.count(name) > 0) {
+                remove_item(name);
+            }
+            else {
+                std::cout << "\nThis item is not in your Inventory";
+            }
+        }
+        else {
+            std::cout << "\nInventory empty.";
         } 
     }
-
+    // Called by sell_item()
     void remove_item(std::string name) {
         int input_quantity;
         Item* item = items[name];
@@ -128,7 +135,7 @@ public:
             std::cout << "\nCannot sell more items than you have.";
         }
     }
-
+    // Lists all items in inventory in console
     void list_items() {
         if (items.size() == 0) {
             std::cout << "\nInventory empty.";
@@ -138,6 +145,21 @@ public:
         for (auto item : items) {
             display_data(*item.second);
             std::cout << "\n";
+        }
+    }
+    // Lists names for selling items
+    bool list_names() {
+        // List names or returns false if empty
+        if (items.size() == 0) {
+            return false;
+        }
+        else {
+            int count = 1;
+            for (auto item : items) {
+                std::cout << "\n" << count << ". " << item.first;
+                count++;
+            }
+            return true;
         }
     }
 };
